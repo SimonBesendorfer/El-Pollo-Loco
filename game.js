@@ -1,16 +1,27 @@
 let canvas;
 let ctx;
-character_x = 0;
+let character_x = 0;
+let character_y = 250;
+let isMovingRight = false;
+let isMovingLeft = false;
+let bg_elements = 0;
+let isJumping = false;
+let isFalling = false;
+
 
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
 
-    setInterval(function (){
-        drawBackground();
-        updateCaracter();
-    }, 50);
+    draw();
+
     listenForKeys();
+}
+
+function draw(){
+    drawBackground();
+    updateCaracter();
+    requestAnimationFrame(draw);
 }
 
 function drawBackground() {
@@ -22,30 +33,86 @@ function drawBackground() {
 function updateCaracter() {
     let base_image = new Image();
     base_image.src = 'img/charakter_1.png';
-    base_image.onload = function () {
-        ctx.drawImage(base_image, character_x, 250, base_image.width * 0.35, base_image.height * 0.35);
-    };
+
+    if(isJumping) {
+        character_y = character_y -10;
+
+        if(character_y < 120) {
+            isFalling = true;
+            isJumping = false;
+        }
+    }
+
+    if(isFalling){
+        character_y = character_y + 10;
+        if(character_y > 250) {
+            isFalling = false;
+        }
+    }
+
+    if (base_image.complete) {
+        ctx.drawImage(base_image, character_x, character_y, base_image.width * 0.35, base_image.height * 0.35);
+    }
 }
 
 function drawGround(){
     ctx.fillStyle = "#FFE699";
     ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
+
+
+    if(isMovingRight){
+        bg_elements = bg_elements -2;
+    }
+
+    if(isMovingLeft){
+        bg_elements = bg_elements +2;
+    }
+
+    let base_image = new Image();
+    base_image.src = 'img/bg_elem_1.png';
+    if (base_image.complete) {
+        ctx.drawImage(base_image, bg_elements, 195, base_image.width * 0.6, base_image.height * 0.6);
+    }
+
+    let base_image2 = new Image();
+    base_image2.src = 'img/bg_elem_2.png';
+    if (base_image2.complete) {
+        ctx.drawImage(base_image2, 450 + bg_elements, 120, base_image2.width * 0.6, base_image2.height * 0.6);
+    }
 }
 
 function listenForKeys(){
     document.addEventListener("keydown", e => {
         const k = e.key;
+
+
         if (k =='ArrowRight'){
+            isMovingRight = true;
             character_x = character_x + 5;
         }
         if (k == 'ArrowLeft'){
+            isMovingLeft = true;
             character_x = character_x - 5;
         }
+        if (e.code == "Space" && !isFalling){
+            isJumping = true;
+        }
+    });
 
-        //if (handler.hasOOwnProperty(k)) {
-        //   handler[k](k); 
-        //}
+    document.addEventListener("keyup", e => {
+        const k = e.key;
+        if (k =='ArrowRight'){
+            isMovingRight = false;
+            character_x = character_x + 5;
+        }
+        if (k == 'ArrowLeft'){
+            isMovingLeft = false;
+            character_x = character_x - 5;
+        }
+        if (e.code == "Space"){
+            isJumping = false;
+        }
     });
 }
 
-//last watched Video 05 - Grafik bewegen
+//last watched Video 09 - Fall implementieren
