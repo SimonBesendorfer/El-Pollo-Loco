@@ -5,14 +5,18 @@ let character_y = 250;
 let isMovingRight = false;
 let isMovingLeft = false;
 let bg_elements = 0;
-let isJumping = false;
-let isFalling = false;
+let lastJumpStarted = 0;
+
+
+
+//...............Game config
+let JUMP_TIME = 300; // in ms
 
 
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
-
+ 
     draw();
 
     listenForKeys();
@@ -34,21 +38,16 @@ function updateCaracter() {
     let base_image = new Image();
     base_image.src = 'img/charakter_1.png';
 
-    if(isJumping) {
-        character_y = character_y -10;
-
-        if(character_y < 120) {
-            isFalling = true;
-            isJumping = false;
+    let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
+    if (timePassedSinceJump < JUMP_TIME) {
+        character_y = character_y - 10;
+    } else {
+        // Check falling
+        if (character_y < 250) {
+            character_y = character_y + 10;
         }
     }
 
-    if(isFalling){
-        character_y = character_y + 10;
-        if(character_y > 250) {
-            isFalling = false;
-        }
-    }
 
     if (base_image.complete) {
         ctx.drawImage(base_image, character_x, character_y, base_image.width * 0.35, base_image.height * 0.35);
@@ -94,8 +93,9 @@ function listenForKeys(){
             isMovingLeft = true;
             character_x = character_x - 5;
         }
-        if (e.code == "Space" && !isFalling){
-            isJumping = true;
+        let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
+        if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2){
+            lastJumpStarted = new Date().getTime();
         }
     });
 
@@ -109,9 +109,9 @@ function listenForKeys(){
             isMovingLeft = false;
             character_x = character_x - 5;
         }
-        if (e.code == "Space"){
-            isJumping = false;
-        }
+        //if (e.code == "Space"){
+        //    isJumping = false;
+        //}
     });
 }
 
