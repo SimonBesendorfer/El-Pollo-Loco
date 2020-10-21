@@ -1,25 +1,47 @@
 let canvas;
 let ctx;
-let character_x = 0;
+let character_x = 100;
 let character_y = 250;
 let isMovingRight = false;
 let isMovingLeft = false;
 let bg_elements = 0;
 let lastJumpStarted = 0;
-
+let currentCharacterImage = 'img/charakter_1.png';
+let characterGraphicsRight = ['img/charakter_1.png', 'img/charakter_2.png', 'img/charakter_3.png', 'img/charakter_4.png',]
+let characterGraphicsLeft = ['img/charakter_left_1.png', 'img/charakter_left_2.png', 'img/charakter_left_3.png', 'img/charakter_left_4.png',]
+let characterGraphicIndex = 0;
 
 
 //...............Game config
 let JUMP_TIME = 300; // in ms
+let GAME_SPEED = 7;
 
 
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+    checkForRunning();
  
     draw();
 
     listenForKeys();
+}
+
+function checkForRunning() {
+    setInterval(function(){
+        if (isMovingRight) { // Change graphic
+            let index = characterGraphicIndex % characterGraphicsRight.length;
+            currentCharacterImage = characterGraphicsRight[index]
+            characterGraphicIndex = characterGraphicIndex +1;
+        }
+
+        if (isMovingLeft) { // Change graphic
+            let index = characterGraphicIndex % characterGraphicsLeft.length;
+            currentCharacterImage = characterGraphicsLeft[index]
+            characterGraphicIndex = characterGraphicIndex +1;   
+        }
+    }, 100);
+    
 }
 
 function draw(){
@@ -36,7 +58,7 @@ function drawBackground() {
 
 function updateCaracter() {
     let base_image = new Image();
-    base_image.src = 'img/charakter_1.png';
+    base_image.src = currentCharacterImage;
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     if (timePassedSinceJump < JUMP_TIME) {
@@ -59,16 +81,21 @@ function drawGround(){
 
 
     if(isMovingRight){
-        bg_elements = bg_elements -2;
+        bg_elements = bg_elements -GAME_SPEED;
     }
 
     if(isMovingLeft){
-        bg_elements = bg_elements +2;
+        bg_elements = bg_elements +GAME_SPEED;
     }
     addBackgroundObject('img/bg_elem_1.png', 0, 195, 0.6, 0.4);
     addBackgroundObject('img/bg_elem_2.png', 450, 120, 0.6, 0.5);
     addBackgroundObject('img/bg_elem_1.png', 700, 255, 0.4, 0.7);
-    addBackgroundObject('img/bg_elem_2.png', 1200, 260, 0.3), 0.5;
+    addBackgroundObject('img/bg_elem_2.png', 1100, 260, 0.3, 0.5);
+
+    addBackgroundObject('img/bg_elem_1.png', 1300, 195, 0.6, 0.4);
+    addBackgroundObject('img/bg_elem_2.png', 1450, 120, 0.6, 0.5);
+    addBackgroundObject('img/bg_elem_1.png', 1700, 255, 0.4, 0.7);
+    addBackgroundObject('img/bg_elem_2.png', 2000, 260, 0.3, 0.5);
 
 
     //draw Ground
@@ -96,11 +123,11 @@ function listenForKeys(){
 
         if (k =='ArrowRight'){
             isMovingRight = true;
-            character_x = character_x + 5;
+            //character_x = character_x + 5;
         }
         if (k == 'ArrowLeft'){
             isMovingLeft = true;
-            character_x = character_x - 5;
+            //character_x = character_x - 5;
         }
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2){
@@ -112,11 +139,11 @@ function listenForKeys(){
         const k = e.key;
         if (k =='ArrowRight'){
             isMovingRight = false;
-            character_x = character_x + 5;
+            //character_x = character_x + 5;
         }
         if (k == 'ArrowLeft'){
             isMovingLeft = false;
-            character_x = character_x - 5;
+            //character_x = character_x - 5;
         }
         //if (e.code == "Space"){
         //    isJumping = false;
