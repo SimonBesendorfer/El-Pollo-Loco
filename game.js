@@ -10,22 +10,48 @@ let currentCharacterImage = 'img/charakter_1.png';
 let characterGraphicsRight = ['img/charakter_1.png', 'img/charakter_2.png', 'img/charakter_3.png', 'img/charakter_4.png',]
 let characterGraphicsLeft = ['img/charakter_left_1.png', 'img/charakter_left_2.png', 'img/charakter_left_3.png', 'img/charakter_left_4.png',]
 let characterGraphicIndex = 0;
-
+let cloudOffset = 0;
+let chickens 
 
 //...............Game config
-let JUMP_TIME = 300; // in ms
+let JUMP_TIME = 500; // in ms
 let GAME_SPEED = 7;
 
 
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+    createChickenList();
     checkForRunning();
- 
     draw();
-
+    calculateCloudOffset();
     listenForKeys();
+    calculateChickenPosition();
 }
+
+function calculateChickenPosition(){
+    setInterval( function(){
+        for(let i = 0; i < chickens.length; i++){
+            let chicken = chickens[i];
+            chicken.position_x = chicken.position_x - chicken.speed;
+        }
+    }, 50);  
+}
+
+function createChickenList(){
+    chickens = [
+        createChicken(1, 200),
+        createChicken(2, 400),
+        createChicken(1, 700)
+    ];
+}
+
+function calculateCloudOffset(){
+    setInterval(function(){
+        cloudOffset = cloudOffset + 0.25;
+    }, 50)
+}
+
 
 function checkForRunning() {
     setInterval(function(){
@@ -48,12 +74,37 @@ function draw(){
     drawBackground();
     updateCaracter();
     requestAnimationFrame(draw);
+    drawChicken();
+}
+
+function drawChicken(){
+    for(i = 0; i < chickens.length; i = i + 1){
+        let chicken = chickens[i];
+        addBackgroundObject(chicken.img, chicken.position_x, chicken.position_y, chicken.scale, 1);
+    } 
+}
+
+function createChicken(type, position_x){
+    return{
+    "img": "img/chicken" + type + ".png",
+    "position_x": position_x,
+    "position_y": 325,
+    "scale": 0.6,
+    "speed": (Math.random() * 5)
+    };
 }
 
 function drawBackground() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     drawGround();
+
+    //draw Clouds
+    addBackgroundObject('img/cloud1.png', 100 - cloudOffset, 20, 0.8, 1);
+    addBackgroundObject('img/cloud2.png', 500 - cloudOffset, 20, 0.6, 1);
+    addBackgroundObject('img/cloud1.png', 800 - cloudOffset, 20, 1, 1);
+    addBackgroundObject('img/cloud2.png', 1300 - cloudOffset, 20, 0.8, 1);   
 }
 
 function updateCaracter() {
@@ -78,8 +129,6 @@ function updateCaracter() {
 
 function drawGround(){
     
-
-
     if(isMovingRight){
         bg_elements = bg_elements -GAME_SPEED;
     }
@@ -102,6 +151,9 @@ function drawGround(){
     ctx.fillStyle = "#FFE699";
     ctx.fillRect(0, 375, canvas.width, canvas.height - 375);
 
+    for(let i = 0; i < 10; i = i+1){
+        addBackgroundObject('img/sand.png',i * canvas.width, 375, 0.360, 0.3)  
+    }
 }
 
 function addBackgroundObject(src, offsetX, offsetY, scale, opacity){
@@ -151,4 +203,4 @@ function listenForKeys(){
     });
 }
 
-//last watched Video 12 - Weitere Kakteen einfügen
+//last watched Video 19 - Gegner Bewegen
