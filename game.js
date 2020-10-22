@@ -2,6 +2,7 @@ let canvas;
 let ctx;
 let character_x = 100;
 let character_y = 250;
+let character_energy = 100;
 let isMovingRight = false;
 let isMovingLeft = false;
 let bg_elements = 0;
@@ -16,6 +17,8 @@ let chickens
 //...............Game config
 let JUMP_TIME = 500; // in ms
 let GAME_SPEED = 7;
+let AUDIO_RUNNING = new Audio('audio/running.mp3');
+let AUDIO_JUMP = new Audio('audio/jump.mp3');
 
 
 function init() {
@@ -27,6 +30,18 @@ function init() {
     calculateCloudOffset();
     listenForKeys();
     calculateChickenPosition();
+    checkForCollision();
+}
+
+function checkForCollision(){
+    setInterval(function(){
+        for(let i = 0; i < chickens.length; i++){
+            let chicken = chickens[i];
+            if ((chicken.position_x - 40) < character_x && (chicken.position_x + 40) > character_x) {
+                character_energy--;
+            }
+        } 
+    },100)
 }
 
 function calculateChickenPosition(){
@@ -56,15 +71,21 @@ function calculateCloudOffset(){
 function checkForRunning() {
     setInterval(function(){
         if (isMovingRight) { // Change graphic
+            AUDIO_RUNNING.play();
             let index = characterGraphicIndex % characterGraphicsRight.length;
             currentCharacterImage = characterGraphicsRight[index]
             characterGraphicIndex = characterGraphicIndex +1;
         }
 
         if (isMovingLeft) { // Change graphic
+            AUDIO_RUNNING.play();
             let index = characterGraphicIndex % characterGraphicsLeft.length;
             currentCharacterImage = characterGraphicsLeft[index]
             characterGraphicIndex = characterGraphicIndex +1;   
+        }
+
+        if(!isMovingRight&& !isMovingLeft){
+            AUDIO_RUNNING.pause();
         }
     }, 100);
     
@@ -75,6 +96,18 @@ function draw(){
     updateCaracter();
     requestAnimationFrame(draw);
     drawChicken();
+    drawEnergyBar();
+}
+
+function drawEnergyBar(){
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "blue";
+    ctx.fillRect(500, 15, 2 * character_energy, 30);
+
+    ctx.globalAlpha = 0.2;
+    ctx.fillStyle = "black";
+    ctx.fillRect(495, 10, 210, 40);
+    ctx.globalAlpha = 1;
 }
 
 function drawChicken(){
@@ -183,6 +216,7 @@ function listenForKeys(){
         }
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2){
+            AUDIO_JUMP.play();
             lastJumpStarted = new Date().getTime();
         }
     });
