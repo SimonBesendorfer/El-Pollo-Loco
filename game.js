@@ -12,13 +12,19 @@ let characterGraphicsRight = ['img/charakter_1.png', 'img/charakter_2.png', 'img
 let characterGraphicsLeft = ['img/charakter_left_1.png', 'img/charakter_left_2.png', 'img/charakter_left_3.png', 'img/charakter_left_4.png',]
 let characterGraphicIndex = 0;
 let cloudOffset = 0;
-let chickens 
+let chickens = [];
+let placedBottles = [1000, 1700, 2500, 2800, 3000, 3300, 3600];
+let collectedBottles = 50;
+let bottleThrowTime = 0;
+let thrownBottle_x = 0;
+let thrownBottle_y = 0;
 
 //...............Game config
 let JUMP_TIME = 500; // in ms
 let GAME_SPEED = 7;
 let AUDIO_RUNNING = new Audio('audio/running.mp3');
 let AUDIO_JUMP = new Audio('audio/jump.mp3');
+let AUDIO_BOTTLE = new Audio('audio/bottle.mp3');
 
 
 function init() {
@@ -35,18 +41,35 @@ function init() {
 
 function checkForCollision(){
     setInterval(function(){
+
+        //Check chicken 
         for(let i = 0; i < chickens.length; i++){
             let chicken = chickens[i];
             let chicken_x = chicken.position_x + bg_elements;
-
-            console.log('chichen.position_y: ' + chicken.position_y);
-            console.log('charakter_y: ' + character_y);
             if ((chicken_x - 40) < character_x && (chicken_x + 40) > character_x) {
                 if(character_y > 210) {
                 character_energy--;
                 }
             }
         } 
+
+        //Check bottle
+        for(let i = 0; i < placedBottles.length; i++){
+            let bottle_x = placedBottles[i] + bg_elements;
+            if ((bottle_x - 40) < character_x && (bottle_x + 40) > character_x) {
+                if(character_y > 210) {
+                placedBottles.splice(i, 1);
+                AUDIO_BOTTLE.play();
+                collectedBottles++;
+                }
+            }
+        }
+
+        //Check final boss
+        if (thrownBottle_x > 1000 + bg_elements - 100 && thrownBottle_x < 1000 + bg_elements){
+            console.log('treffer');
+        }
+
     },100)
 }
 
@@ -61,9 +84,12 @@ function calculateChickenPosition(){
 
 function createChickenList(){
     chickens = [
-        createChicken(1, 200),
-        createChicken(2, 400),
-        createChicken(1, 700)
+        createChicken(1, 700),
+        createChicken(2, 1400),
+        createChicken(1, 1800),
+        createChicken(1, 2500),
+        createChicken(2, 3000)
+
     ];
 }
 
@@ -100,9 +126,52 @@ function checkForRunning() {
 function draw(){
     drawBackground();
     updateCaracter();
-    requestAnimationFrame(draw);
     drawChicken();
+    drawBottles();
+    requestAnimationFrame(draw);
     drawEnergyBar();
+    drawInformation();
+    drawThrowBottle();
+    drawFinalBoss();
+}
+
+function drawFinalBoss(){
+    let chicken_x = 500;
+    addBackgroundObject('img/chicken_big.png', chicken_x, 95, 0.45, 1);
+}
+
+function drawThrowBottle(){
+    if (bottleThrowTime) {
+        let timePassed = new Date().getTime() - bottleThrowTime;
+        let gravity = Math.pow(9.81, timePassed / 300);
+        thrownBottle_x = 125 + (timePassed * 0.7);
+        thrownBottle_y = 300 - (timePassed * 0.6 - gravity);
+    
+        let base_image = new Image();
+        base_image.src = 'img/tabasco.png';
+        if (base_image.complete) {
+        ctx.drawImage(base_image, thrownBottle_x, thrownBottle_y, base_image.width * 0.5, base_image.height * 0.5);
+        }
+    }
+}
+
+function drawInformation(){
+
+    let base_image = new Image();
+    base_image.src = 'img/tabasco.png';
+    if (base_image.complete) {
+        ctx.drawImage(base_image, 0, 0, base_image.width * 0.5, base_image.height * 0.5);
+    }
+
+    ctx.font = '30px Architects Daughter';
+    ctx.fillText('x ' +  collectedBottles, 50, 33);
+}
+
+function drawBottles(){
+    for(let i = 0; i < placedBottles.length; i++){
+        let bottle_x = placedBottles[i];
+        addBackgroundObject('img/tabasco.png', bottle_x, 318, 0.7, 1);
+    }
 }
 
 function drawEnergyBar(){
@@ -137,13 +206,17 @@ function drawBackground() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    drawGround();
-
     //draw Clouds
     addBackgroundObject('img/cloud1.png', 100 - cloudOffset, 20, 0.8, 1);
     addBackgroundObject('img/cloud2.png', 500 - cloudOffset, 20, 0.6, 1);
     addBackgroundObject('img/cloud1.png', 800 - cloudOffset, 20, 1, 1);
-    addBackgroundObject('img/cloud2.png', 1300 - cloudOffset, 20, 0.8, 1);   
+    addBackgroundObject('img/cloud2.png', 1300 - cloudOffset, 20, 0.8, 1); 
+    addBackgroundObject('img/cloud1.png', 1800 - cloudOffset, 20, 0.8, 1); 
+    addBackgroundObject('img/cloud2.png', 2300 - cloudOffset, 20, 0.8, 1);  
+    addBackgroundObject('img/cloud2.png', 2800 - cloudOffset, 20, 0.8, 1); 
+    addBackgroundObject('img/cloud2.png', 3500 - cloudOffset, 20, 0.8, 1);  
+
+    drawGround();
 }
 
 function updateCaracter() {
@@ -169,11 +242,11 @@ function updateCaracter() {
 function drawGround(){
     
     if(isMovingRight){
-        bg_elements = bg_elements -GAME_SPEED;
+        bg_elements = bg_elements - GAME_SPEED;
     }
 
-    if(isMovingLeft){
-        bg_elements = bg_elements +GAME_SPEED;
+    if(isMovingLeft && bg_elements < 500){
+        bg_elements = bg_elements + GAME_SPEED;
     }
     addBackgroundObject('img/bg_elem_1.png', 0, 195, 0.6, 0.4);
     addBackgroundObject('img/bg_elem_2.png', 450, 120, 0.6, 0.5);
@@ -184,6 +257,16 @@ function drawGround(){
     addBackgroundObject('img/bg_elem_2.png', 1450, 120, 0.6, 0.5);
     addBackgroundObject('img/bg_elem_1.png', 1700, 255, 0.4, 0.7);
     addBackgroundObject('img/bg_elem_2.png', 2000, 260, 0.3, 0.5);
+
+    addBackgroundObject('img/bg_elem_1.png', 2300, 195, 0.6, 0.4);
+    addBackgroundObject('img/bg_elem_2.png', 2450, 120, 0.6, 0.5);
+    addBackgroundObject('img/bg_elem_1.png', 2700, 255, 0.4, 0.7);
+    addBackgroundObject('img/bg_elem_2.png', 3000, 260, 0.3, 0.5);
+
+    addBackgroundObject('img/bg_elem_1.png', 4300, 195, 0.6, 0.4);   
+    addBackgroundObject('img/bg_elem_2.png', 4450, 120, 0.6, 0.5);
+    addBackgroundObject('img/bg_elem_1.png', 4700, 255, 0.4, 0.7);
+    addBackgroundObject('img/bg_elem_2.png', 5000, 260, 0.3, 0.5);
 
 
     //draw Ground
@@ -220,6 +303,15 @@ function listenForKeys(){
             isMovingLeft = true;
             //character_x = character_x - 5;
         }
+
+        if (k == 't' && collectedBottles > 0){
+            let timePassed = new Date().getTime() - bottleThrowTime;
+            if (timePassed > 1000){
+                collectedBottles--;
+                bottleThrowTime = new Date().getTime();
+            }
+        }
+
         let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
         if (e.code == 'Space' && timePassedSinceJump > JUMP_TIME * 2){
             AUDIO_JUMP.play();
