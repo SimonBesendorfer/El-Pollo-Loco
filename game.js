@@ -335,4 +335,4 @@ function listenForKeys(){
     });
 }
 
-//last watched Video 23 - collision dedection 2
+//last watched Video 29 - Endgegner einfügen
