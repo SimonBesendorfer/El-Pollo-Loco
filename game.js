@@ -3,6 +3,7 @@ let ctx;
 let character_x = 100;
 let character_y = 250;
 let character_energy = 100;
+let final_boss_energy = 100;
 let isMovingRight = false;
 let isMovingLeft = false;
 let bg_elements = 0;
@@ -25,6 +26,12 @@ let GAME_SPEED = 7;
 let AUDIO_RUNNING = new Audio('audio/running.mp3');
 let AUDIO_JUMP = new Audio('audio/jump.mp3');
 let AUDIO_BOTTLE = new Audio('audio/bottle.mp3');
+let AUDIO_THROW = new Audio('audio/throw.mp3');
+let AUDIO_CHICKEN = new Audio('audio/chicken.mp3');
+let AUDIO_GLASS = new Audio('audio/glass.mp3');
+let AUDIO_THEME = new Audio('audio/el_pollo_loco_march.mp3');
+AUDIO_THEME.loop = true;
+AUDIO_THEME.volume = 0.2;
 
 
 function init() {
@@ -68,6 +75,8 @@ function checkForCollision(){
         //Check final boss
         if (thrownBottle_x > 1000 + bg_elements - 100 && thrownBottle_x < 1000 + bg_elements){
             console.log('treffer');
+            final_boss_energy = final_boss_energy - 10;
+            AUDIO_GLASS.play();
         }
 
     },100)
@@ -136,8 +145,18 @@ function draw(){
 }
 
 function drawFinalBoss(){
-    let chicken_x = 500;
+    let chicken_x = 1000;
     addBackgroundObject('img/chicken_big.png', chicken_x, 95, 0.45, 1);
+
+
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "red";
+    ctx.fillRect(970 + bg_elements, 95, 2 * final_boss_energy, 10);
+
+    ctx.globalAlpha = 0.2;
+    ctx.fillStyle = "black";
+    ctx.fillRect(968 + bg_elements, 92, 205, 15);
+    ctx.globalAlpha = 1;
 }
 
 function drawThrowBottle(){
@@ -309,6 +328,7 @@ function listenForKeys(){
             if (timePassed > 1000){
                 collectedBottles--;
                 bottleThrowTime = new Date().getTime();
+                AUDIO_THROW.play();
             }
         }
 
