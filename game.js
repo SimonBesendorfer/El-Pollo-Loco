@@ -37,8 +37,14 @@ function checkForCollision(){
     setInterval(function(){
         for(let i = 0; i < chickens.length; i++){
             let chicken = chickens[i];
-            if ((chicken.position_x - 40) < character_x && (chicken.position_x + 40) > character_x) {
+            let chicken_x = chicken.position_x + bg_elements;
+
+            console.log('chichen.position_y: ' + chicken.position_y);
+            console.log('charakter_y: ' + character_y);
+            if ((chicken_x - 40) < character_x && (chicken_x + 40) > character_x) {
+                if(character_y > 210) {
                 character_energy--;
+                }
             }
         } 
     },100)
@@ -237,4 +243,4 @@ function listenForKeys(){
     });
 }
 
-//last watched Video 19 - Gegner Bewegen
+//last watched Video 23 - collision dedection 2
