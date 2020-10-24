@@ -15,7 +15,7 @@ let characterGraphicIndex = 0;
 let cloudOffset = 0;
 let chickens = [];
 let placedBottles = [400, 1000,1200, 1700, 2500, 2600, 2800, 3000, 3150, 3300, 3350, 3600, 3680,];
-let collectedBottles = 50;
+let collectedBottles = 0;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0;
 let thrownBottle_y = 0;
@@ -23,10 +23,15 @@ let bossDefeatedAt = 0;
 let character_lost_at = 0;
 let game_finished = false;
 
+let imagePaths = ['img/bg_elem_1.png', 'img/bg_elem_2.png', 'img/charakter_1.png', 'img/charakter_2.png', 'img/charakter_3.png', 'img/charakter_4.png',
+'img/charakter_jumping.png', 'img/charakter_left_1.png', 'img/charakter_left_2.png', 'img/charakter_left_3.png', 'img/charakter_left_4.png', 
+'img/chicken_big.png', 'img/chicken_dead.png', 'img/chicken1.png', 'img/chicken2.png', 'img/cloud1.png', 'img/cloud2.png', 'img/hit.png', 'img/sand.png', 'img/tabasco.png'];
+let images = [];
+
 //...............Game config
 let JUMP_TIME = 500; // in ms
 let GAME_SPEED = 7;
-let BOSS_POSITION = 500;
+let BOSS_POSITION = 5000;
 let AUDIO_RUNNING = new Audio('audio/running.mp3');
 let AUDIO_JUMP = new Audio('audio/jump.mp3');
 let AUDIO_BOTTLE = new Audio('audio/bottle.mp3');
@@ -42,6 +47,7 @@ AUDIO_THEME.volume = 0.2;
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+    preloadImages();
     createChickenList();
     checkForRunning();
     draw();
@@ -71,10 +77,18 @@ function checkForCollision(){
         } 
 
         //Check Caracter collison with Boss
-        //if ((BOSS_POSITION - 170) < character_x && (BOSS_POSITION + 70) > character_x){
-          //      character_lost_at = new Date().getTime();
-            //    game_finished = true;
-        //}
+        let BossX = BOSS_POSITION;
+        
+        if (character_x - bg_elements >= BossX - 40) {
+            
+                if(character_energy > 0) {
+                    character_energy -= 100; //is the same like: character_energy = character_energy - 10;
+                } else {
+                    character_lost_at = new Date().getTime();
+                    game_finished = true;
+                }
+            
+        }
 
         //Check bottle
         for(let i = 0; i < placedBottles.length; i++){
@@ -86,7 +100,7 @@ function checkForCollision(){
                 collectedBottles++;
                 }
             }
-        }
+        } 
 
         //Check final boss
         if (thrownBottle_x > BOSS_POSITION + bg_elements - 100 && thrownBottle_x < BOSS_POSITION + bg_elements){
@@ -97,7 +111,7 @@ function checkForCollision(){
                 bossDefeatedAt = new Date().getTime();
                 finishLevel();
             } 
-        }
+        } 
     },100)
 }
 
@@ -192,7 +206,6 @@ function checkForRunning() {
 
 function draw(){
     drawBackground();
-    
     if (game_finished) {
         drawFinalScreen();
         AUDIO_THEME.pause();
@@ -206,13 +219,12 @@ function draw(){
         drawEnergyBar();
         drawInformation();
         drawThrowBottle();
-        startTheme();
     }
 }
 
 function startTheme(){
-    
-}
+    AUDIO_THEME.play();
+ }
 
 function drawFinalScreen(){
 
@@ -331,6 +343,7 @@ function drawBackground() {
 function updateCaracter() {
     let base_image = new Image();
     base_image.src = currentCharacterImage;
+    checkBackgroundImageCache(currentCharacterImage);
 
     let timePassedSinceJump = new Date().getTime() - lastJumpStarted;
     if (timePassedSinceJump < JUMP_TIME) {
@@ -406,6 +419,7 @@ function listenForKeys(){
 
         if (k =='ArrowRight'){
             isMovingRight = true;
+            startTheme();
             //character_x = character_x + 5;
         }
         if (k == 'ArrowLeft'){
@@ -446,61 +460,33 @@ function listenForKeys(){
 }
 
 /**
-
 * Preload all images. This function should be executed before starting the game.
-
 * imagePaths should contain all images that will be loaded: ['img/image1.png', 'img/image2.png', 'img/image3.png', ...]
-
 */
-
 function preloadImages() {
-
-    for (let i = 0; i < imagePaths.length; i++) {
-  
-      let image = new Image();
-  
+    for (let i = 0; i < imagePaths.length; i++) {  
+      let image = new Image();  
       image.src = imagePaths[i];
-  
-      images.push(image); // push image-path to images-array (which contains all image-paths)
-  
-    }
-  
+      console.log(image.src);
+      images.push(image); // push image-path to images-array (which contains all image-paths)  
+    }  
   }
-  
-  
-  
-  
-  
-  /**
-  
-     * Check if background-image is already loaded in cache; if not, create new image
-  
-     * @param {string} src_path - scr-path of background-image 
-  
-     */
-  
-  function checkBackgroundImageCache(src_path) {
-  
-    // Check if image is found in images-array.
-  
-    base_image = images.find(function (img) {
-  
-      return img.src.endsWith(src_path.substring(src_path, src_path.length));
-  
+      
+  /**  
+     * Check if background-image is already loaded in cache; if not, create new image  
+     * @param {string} src_path - scr-path of background-image   
+     */  
+  function checkBackgroundImageCache(src_path) {  
+    // Check if image is found in images-array.  
+    base_image = images.find(function (img) {  
+      return img.src.endsWith(src_path.substring(src_path, src_path.length));  
     })
   
-    
-  
-    // Create new image if not found in cache
-  
-    if (!base_image) {
-  
-      base_image = new Image();
-  
-      base_image.src = src_path;
-  
+    // Create new image if not found in cache  
+    if (!base_image) {  
+      base_image = new Image();  
+      base_image.src = src_path;  
     }
-  
-  }
+}
   
   
