@@ -5,11 +5,27 @@
         <script src="game.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
     </head>
-    <body onload="init()">
+    <body onload="">
 
-        <h1>El Pollo Loco</h1>
+        <img src="img/background.png" class="background">
+        <div class="game">
+
+            <h1>El Pollo Loco</h1>
+            <h2>How to Play</h2>
+            <h3>below you can check how to stear your character</h3>
+            <div class="howTo">
+                <img src="img/right.png"><h4>go foward</h4>
+                <img src="img/left.png"><h4>go back</h4>
+                <img src="img/space.png"><h4>jump</h4>
+                <img src="img/T.png"><h4>thow bottle</h4>
+            </div>
         
-        <canvas id="canvas" width="720" height="480"></canvas>
+            <button class="startBtn" onclick="init()">start</button>
+    
+            <canvas class="canvas" id="canvas" width="720" height="480"></canvas>
+
+        </div>
+      
 
     </body>
 </html>

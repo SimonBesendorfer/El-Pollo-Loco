@@ -47,6 +47,7 @@ AUDIO_THEME.volume = 0.2;
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+    startTheme();
     preloadImages();
     createChickenList();
     checkForRunning();
@@ -419,7 +420,6 @@ function listenForKeys(){
 
         if (k =='ArrowRight'){
             isMovingRight = true;
-            startTheme();
             //character_x = character_x + 5;
         }
         if (k == 'ArrowLeft'){
