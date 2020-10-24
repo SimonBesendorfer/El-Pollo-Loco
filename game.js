@@ -14,7 +14,7 @@ let characterGraphicsLeft = ['img/charakter_left_1.png', 'img/charakter_left_2.p
 let characterGraphicIndex = 0;
 let cloudOffset = 0;
 let chickens = [];
-let placedBottles = [1000, 1700, 2500, 2800, 3000, 3300, 3600];
+let placedBottles = [400, 1000,1200, 1700, 2500, 2600, 2800, 3000, 3150, 3300, 3350, 3600, 3680,];
 let collectedBottles = 50;
 let bottleThrowTime = 0;
 let thrownBottle_x = 0;
@@ -26,7 +26,7 @@ let game_finished = false;
 //...............Game config
 let JUMP_TIME = 500; // in ms
 let GAME_SPEED = 7;
-let BOSS_POSITION = 5000;
+let BOSS_POSITION = 500;
 let AUDIO_RUNNING = new Audio('audio/running.mp3');
 let AUDIO_JUMP = new Audio('audio/jump.mp3');
 let AUDIO_BOTTLE = new Audio('audio/bottle.mp3');
@@ -69,6 +69,12 @@ function checkForCollision(){
                 }
             }
         } 
+
+        //Check Caracter collison with Boss
+        //if ((BOSS_POSITION - 170) < character_x && (BOSS_POSITION + 70) > character_x){
+          //      character_lost_at = new Date().getTime();
+            //    game_finished = true;
+        //}
 
         //Check bottle
         for(let i = 0; i < placedBottles.length; i++){
@@ -124,6 +130,32 @@ function createChickenList(){
         createChicken(1, 4200),
         createChicken(1, 4400),
         createChicken(2, 5000),
+        createChicken(1, 5700),
+        createChicken(2, 6400),
+        createChicken(1, 6800),
+        createChicken(1, 7500),
+        createChicken(2, 8000),
+        createChicken(2, 8300),
+        createChicken(2, 8800),
+        createChicken(1, 9200),
+        createChicken(1, 9400),
+        createChicken(2, 10000),
+        createChicken(2, 8800),
+        createChicken(1, 9200),
+        createChicken(1, 9400),
+        createChicken(2, 10000),
+        createChicken(2, 8800),
+        createChicken(1, 9200),
+        createChicken(1, 9400),
+        createChicken(2, 10000),
+        createChicken(2, 8800),
+        createChicken(1, 9200),
+        createChicken(1, 9400),
+        createChicken(2, 10000),
+        createChicken(2, 18800),
+        createChicken(1, 19200),
+        createChicken(1, 19400),
+        createChicken(2, 19500),
     ];
 }
 
@@ -160,7 +192,7 @@ function checkForRunning() {
 
 function draw(){
     drawBackground();
-    drawFinalBoss();
+    
     if (game_finished) {
         drawFinalScreen();
         AUDIO_THEME.pause();
@@ -168,6 +200,7 @@ function draw(){
     } else {
         updateCaracter();
         drawChicken();
+        drawFinalBoss();
         drawBottles();
         requestAnimationFrame(draw);
         drawEnergyBar();
@@ -321,7 +354,7 @@ function drawGround(){
         bg_elements = bg_elements - GAME_SPEED;
     }
 
-    if(isMovingLeft && bg_elements < 500){
+    if(isMovingLeft && bg_elements < 0){
         bg_elements = bg_elements + GAME_SPEED;
     }
     addBackgroundObject('img/bg_elem_1.png', 0, 195, 0.6, 0.4);
