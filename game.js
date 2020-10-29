@@ -210,6 +210,7 @@ function draw(){
     if (game_finished) {
         drawFinalScreen();
         AUDIO_THEME.pause();
+        document.getElementById('replayBtn').classList.remove('d-none');
         //Draw success screene
     } else {
         updateCaracter();
@@ -489,4 +490,10 @@ function preloadImages() {
     }
 }
   
-  
+function dissable(){
+    document.getElementById('startBtn').classList.add('d-none');
+}
+
+function refreshPage(){
+    window.location.reload();
+} 

@@ -39,6 +39,7 @@ h1 {
     border: solid;
     border-width: 8px;
     margin-bottom: 180px;
+    background-color: ghostwhite;
 }
 
 .startBtn {
@@ -86,4 +87,8 @@ h2 {
 }
 .howTo {
     align-items: center;
+}
+
+.d-none {
+    display: none;
 }
